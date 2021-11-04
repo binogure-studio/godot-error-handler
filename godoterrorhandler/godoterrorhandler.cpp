@@ -1,6 +1,6 @@
 #include "godoterrorhandler.h"
 
-GodotErrorHandler *GodotErrorHandler::singleton = NULL;
+GodotErrorHandler *GodotErrorHandler::singleton = nullptr;
 
 GodotErrorHandler::GodotErrorHandler() {
 
@@ -14,25 +14,25 @@ GodotErrorHandler::GodotErrorHandler() {
 GodotErrorHandler::~GodotErrorHandler() {
 
 	remove_error_handler(&eh);
-  singleton = NULL;
+  singleton = nullptr;
 }
 
 GodotErrorHandler *GodotErrorHandler::get_singleton() {
-  if (GodotErrorHandler::singleton == NULL) {
+  if (GodotErrorHandler::singleton == nullptr) {
     GodotErrorHandler::singleton = new GodotErrorHandler();
   }
 
   return GodotErrorHandler::singleton;
 }
 
-void GodotErrorHandler::_err_handler(void *ud, const char *p_func, const char *p_file, int p_line, const char *p_err, const char *p_descr, ErrorHandlerType p_type) {
+void GodotErrorHandler::_err_handler(void *p_self, const char *p_func, const char *p_file, int p_line, const char *p_error, const char *p_errorexp, bool p_editor_notify, ErrorHandlerType p_type) {
 
-	GodotErrorHandler *gdh = (GodotErrorHandler *)ud;
+	GodotErrorHandler *gdh = (GodotErrorHandler *)p_self;
 
 	Dictionary errorObject;
 
-	errorObject["error"] = p_err;
-	errorObject["error_descr"] = p_descr;
+	errorObject["error"] = p_error;
+	errorObject["error_descr"] = p_errorexp;
 	errorObject["source_file"] = p_file;
 	errorObject["source_line"] = p_line;
 	errorObject["source_func"] = p_func;
@@ -49,14 +49,8 @@ void GodotErrorHandler::_err_handler(void *ud, const char *p_func, const char *p
 
 	cstack.resize(si.size() * 2);
 	for (int i = 0; i < si.size(); i++) {
-		String path;
-		int line = 0;
-		if (si[i].script.is_valid()) {
-			path = si[i].script->get_path();
-			line = si[i].line;
-		}
-		cstack[i * 2 + 0] = path;
-		cstack[i * 2 + 1] = line;
+		cstack[i * 2 + 0] = si[i].file;
+		cstack[i * 2 + 1] = si[i].line;
 	}
 
 	errorObject["callstack"] = cstack;
@@ -65,16 +59,16 @@ void GodotErrorHandler::_err_handler(void *ud, const char *p_func, const char *p
 }
 
 void GodotErrorHandler::handle_error(Dictionary errorObject) {
-  emit_signal("error_threw", errorObject);
+  emit_signal(SNAME("error_threw"), errorObject);
 }
 
 
 void GodotErrorHandler::reset_singleton() {
   delete GodotErrorHandler::singleton;
 
-  GodotErrorHandler::singleton = NULL;
+  GodotErrorHandler::singleton = nullptr;
 }
 
 void GodotErrorHandler::_bind_methods() {
-  ADD_SIGNAL(MethodInfo("error_threw", PropertyInfo(Variant::DICTIONARY, "errorObject")));
+	ADD_SIGNAL(MethodInfo("error_threw", PropertyInfo(Variant::DICTIONARY, "errorObject")));
 }

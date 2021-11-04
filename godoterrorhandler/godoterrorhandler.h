@@ -3,25 +3,22 @@
 
 #include <inttypes.h>
 
-#include "error_macros.h"
-#include "dictionary.h"
-#include "object.h"
-#include "reference.h"
-#include "script_language.h"
+#include "core/error/error_macros.h"
+#include "core/object/object.h"
+#include "core/object/script_language.h"
+#include "core/variant/dictionary.h"
 
 class GodotErrorHandler : public Object
 {
-public:
-  static GodotErrorHandler *get_singleton();
-  static void reset_singleton();
-  GodotErrorHandler();
-  ~GodotErrorHandler();
+  GDCLASS(GodotErrorHandler, Object);
 
-  void handle_error(Dictionary errorObject);
+  static GodotErrorHandler *singleton;
+	static void _err_handler(void *p_self, const char *p_func, const char *p_file, int p_line, const char *p_error, const char *p_errorexp, bool p_editor_notify, ErrorHandlerType p_type);
+  
+	ErrorHandlerList eh;
 
 protected:
   static void _bind_methods();
-  static GodotErrorHandler *singleton;
 
   struct ErrorObject {
 
@@ -34,12 +31,12 @@ protected:
     Array callstack;
   };
 
-private:
-	static void _err_handler(void *, const char *, const char *, int p_line, const char *, const char *, ErrorHandlerType p_type);
+public:
+  static GodotErrorHandler *get_singleton();
+  static void reset_singleton();
+  GodotErrorHandler();
+  ~GodotErrorHandler();
 
-	ErrorHandlerList eh;
-
-  OBJ_TYPE(GodotErrorHandler, Object);
-  OBJ_CATEGORY("GodotErrorHandler");
+  void handle_error(Dictionary errorObject);
 };
 #endif // GODOTERRORHANDLER_H

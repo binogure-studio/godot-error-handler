@@ -1,10 +1,10 @@
 # Godot Error Handler
 
-Simple error handler module for Godot Engine
+Simple error handler module for Godot Engine 4
 
 ## Installation
 
-Copy `godoterrorhandler` to the `godot/modules` folder. Then [compile Godot](http://docs.godotengine.org/en/2.1/development/compiling/introduction_to_the_buildsystem.html)
+Copy `godoterrorhandler` to the `godot/modules` folder. Then [compile Godot](https://docs.godotengine.org/en/stable/development/compiling/index.html)
 
 ## Usage
 
